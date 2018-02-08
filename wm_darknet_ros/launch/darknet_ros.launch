@@ -9,8 +9,15 @@
     <rosparam command="load" ns="darknet_ros" file="$(find wm_darknet_ros)/config/ros.yaml"/>
     <rosparam command="load" ns="darknet_ros" file="$(find wm_darknet_ros)/config/yolo9000.yaml"/>
 
+    <!--Start throttle-->
+    <node pkg="throttle" type="throttle" name="throttle"
+          intopic="/usb_cam/image_raw" msgs_per_sec="30" outtopic="/darknet_ros/yolo_throttled" output="screen"
+          launch-prefix="xterm -e gdb --args" >
+    </node>
+    
     <!-- Start darknet and ros wrapper -->
     <node pkg="wm_darknet_ros" type="wm_darknet_ros" name="darknet_ros" output="screen" launch-prefix="xterm -e gdb --args" >
+        <remap from="/usb_cam/image_raw" to="/darknet_ros/yolo_throttled" />
         <param name="weights_path"          value="$(arg yolo_weights_path)" />
         <param name="config_path"           value="$(arg yolo_config_path)" />
     </node>
